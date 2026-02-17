@@ -83,7 +83,7 @@ export default function GetInvolvedPage() {
       type: "Duration - Two Months, Onsite/Remote",
       salary: "Unpaid",
       experience: "UG/PG/Doctorate (All Disciplines)",
-      posted: "1/02/2026",
+      posted: "16/12/2026",
       urgent: true,
       remote: true,
       description: "Are you passionate about social development, grassroots engagement, and creating meaningful impact? Join HAPEF to work closely with communities and gain hands-on field experience.",
