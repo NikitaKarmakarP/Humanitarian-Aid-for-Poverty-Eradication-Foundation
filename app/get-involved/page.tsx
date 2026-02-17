@@ -42,7 +42,8 @@ import {
   CheckCircle,
   CheckCircle2,
   Loader2,
-  Send
+  Send,
+  ExternalLink
 } from "lucide-react"
 
 export default function GetInvolvedPage() {
@@ -75,19 +76,38 @@ export default function GetInvolvedPage() {
 
   const jobPositions = [
     {
-      id: 1,
-      title: "Development Intership Trainee",
+      id: 2,
+      title: "Development Internship Trainee",
       department: "Programs",
       location: "Pakur, Jharkhand",
-      type: "Duration - Two Months, Onsite",
+      type: "Duration - Two Months, Onsite/Remote",
       salary: "Unpaid",
-      experience: "Degree - Any Graduate or Post Graduate",
+      experience: "UG/PG/Doctorate (All Disciplines)",
       posted: "1/02/2026",
       urgent: true,
-      remote: false,
-      description: "Manage rural development programs focusing on sustainable agriculture and community empowerment."
+      remote: true,
+      description: "Are you passionate about social development, grassroots engagement, and creating meaningful impact? Join HAPEF to work closely with communities and gain hands-on field experience.",
+      fullDescription: "🌱 We Are Hiring Interns | HAPEF | Onsite/Remote Opportunity 🌱\n\nAre you passionate about social development, grassroots engagement, and creating meaningful impact? Here’s your chance to work closely with communities and gain hands-on field experience!\n\n📍 Location: Pakur, Jharkhand\n🕒 Mode: Onsite / Remote\n⏳ Minimum Duration: 2 Months\n⏰ Flexible Timings\n\nWe are inviting applications from UG/PG/Doctorate students (all disciplines) who are eager to contribute to the social sector. This internship offers a valuable opportunity to work at the grassroots level, understand development challenges, and contribute to sustainable community initiatives.",
+      skills: [
+        "Students from all types of disciplines pursuing UG/PG/Doctorate or equivalent can apply.",
+        "Proven experience in social sector will be a plus point. Although, freshers are also welcome.",
+        "Excellent written and verbal communication skills.",
+        "Ability to think creatively and strategically.",
+        "Strong analytical skills and proficiency in data analysis tools will be desirable.",
+        "Team player with strong interpersonal skills."
+      ],
+      applyForm: "https://forms.gle/AmNtarMgsrTwT3zVA",
+      applyEmail: "info.hapef@gmail.com"
     }
   ]
+
+  const filteredPositions = jobPositions.filter(job => {
+    const matchesDepartment = selectedDepartment === "All Departments" || job.department === selectedDepartment;
+    const matchesType = selectedType === "All Types" || job.type.includes(selectedType);
+    const matchesLocation = selectedLocation === "All Locations" ||
+      (selectedLocation === "Remote/Onsite" ? job.remote : job.location.includes(selectedLocation));
+    return matchesDepartment && matchesType && matchesLocation;
+  });
 
   const applicationSteps = [
     {
@@ -229,10 +249,10 @@ export default function GetInvolvedPage() {
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-blue-600 mb-2">100%</div>
-                <div className="text-sm text-gray-600 font-medium">Remote Friendly</div>
+                <div className="text-sm text-gray-600 font-medium">Remote/Onsite Friendly</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-2">1</div>
+                <div className="text-3xl font-bold text-purple-600 mb-2">{jobPositions.length}</div>
                 <div className="text-sm text-gray-600 font-medium">Open Positions</div>
               </div>
             </div>
@@ -296,7 +316,8 @@ export default function GetInvolvedPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="All Locations">All Locations</SelectItem>
-                <SelectItem value="Remote">Remote</SelectItem>
+                <SelectItem value="Remote/Onsite">Remote/Onsite Friendly</SelectItem>
+                <SelectItem value="Pakur, Jharkhand">Pakur, Jharkhand</SelectItem>
                 <SelectItem value="Kolkata, West Bengal">Kolkata, West Bengal</SelectItem>
                 <SelectItem value="Multiple Locations">Multiple Locations</SelectItem>
               </SelectContent>
@@ -309,7 +330,7 @@ export default function GetInvolvedPage() {
 
           {/* Job Listings */}
           <div className="space-y-6 mb-12">
-            {jobPositions.map((job) => (
+            {filteredPositions.map((job) => (
               <Card key={job.id} className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-emerald-500">
                 <CardContent className="p-8">
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -323,7 +344,7 @@ export default function GetInvolvedPage() {
                         )}
                         {job.remote && (
                           <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
-                            Remote
+                            Remote/Onsite
                           </Badge>
                         )}
                       </div>
@@ -375,35 +396,78 @@ export default function GetInvolvedPage() {
                           <div className="space-y-6 py-4">
                             <div>
                               <h4 className="font-semibold text-gray-900 mb-2">About the Role</h4>
-                              <p className="text-gray-600 leading-relaxed">{job.description}</p>
+                              {job.fullDescription ? (
+                                <div className="text-gray-600 leading-relaxed whitespace-pre-wrap">
+                                  {job.fullDescription}
+                                </div>
+                              ) : (
+                                <p className="text-gray-600 leading-relaxed">{job.description}</p>
+                              )}
                             </div>
 
-                            <div>
-                              <h4 className="font-semibold text-gray-900 mb-2">Key Responsibilities</h4>
-                              <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                                <li>Support the planning and execution of rural development projects.</li>
-                                <li>Engage with local communities to understand their needs and challenges.</li>
-                                <li>Assist in data collection, monitoring, and reporting of program impact.</li>
-                                <li>Coordinate with field staff and stakeholders to ensure smooth operations.</li>
-                                <li>Contribute to the creation of training materials and workshops.</li>
-                              </ul>
-                            </div>
+                            {job.skills && (
+                              <div>
+                                <h4 className="font-semibold text-gray-900 mb-2">Key Highlights & Requirements</h4>
+                                <ul className="list-disc pl-5 space-y-2 text-gray-600">
+                                  {job.skills.map((skill, idx) => (
+                                    <li key={idx}>{skill}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
 
                             <div>
-                              <h4 className="font-semibold text-gray-900 mb-2">Requirements</h4>
+                              <h4 className="font-semibold text-gray-900 mb-2">Job Details</h4>
                               <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-sm text-gray-600">
-                                <p><span className="font-medium text-gray-900">Experience:</span> {job.experience}</p>
-                                <p><span className="font-medium text-gray-900">Education:</span> Graduate or Post Graduate degree in Social Work, Rural Development, Agriculture, or related fields.</p>
-                                <p><span className="font-medium text-gray-900">Skills:</span> Strong communication, empathy, basic computer literacy, and willingness to work in rural settings.</p>
+                                <p><span className="font-medium text-gray-900">Experience/Eligibility:</span> {job.experience}</p>
+                                <p><span className="font-medium text-gray-900">Location:</span> {job.location}</p>
+                                <p><span className="font-medium text-gray-900">Type:</span> {job.type}</p>
                               </div>
                             </div>
+
+                            {(job.applyForm || job.applyEmail) && (
+                              <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
+                                <h4 className="font-bold text-emerald-900 mb-4 flex items-center gap-2">
+                                  <Send className="h-5 w-5" />
+                                  How to Apply
+                                </h4>
+                                <div className="space-y-4">
+                                  {job.applyForm && (
+                                    <div className="flex flex-col gap-2">
+                                      <p className="text-sm text-emerald-800">Fill out the official Google Form:</p>
+                                      <a
+                                        href={job.applyForm}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 text-emerald-700 font-bold hover:underline break-all"
+                                      >
+                                        {job.applyForm}
+                                        <ExternalLink className="h-4 w-4" />
+                                      </a>
+                                    </div>
+                                  )}
+                                  {job.applyEmail && (
+                                    <div className="flex flex-col gap-2">
+                                      <p className="text-sm text-emerald-800">Or send your CV to:</p>
+                                      <a
+                                        href={`mailto:${job.applyEmail}`}
+                                        className="inline-flex items-center gap-2 text-emerald-700 font-bold hover:underline"
+                                      >
+                                        {job.applyEmail}
+                                        <Mail className="h-4 w-4" />
+                                      </a>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
                           </div>
 
                           <div className="flex justify-end gap-3 pt-4 border-t">
                             <Button className="bg-emerald-600 hover:bg-emerald-700 w-full sm:w-auto" onClick={() => {
                               document.getElementById('application-form')?.scrollIntoView({ behavior: 'smooth' });
                             }}>
-                              Apply Now
+                              Apply via Website
                             </Button>
                           </div>
                         </DialogContent>
