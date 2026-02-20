@@ -26,7 +26,7 @@ export function PhotoGalleryHero() {
         <h1 className="text-4xl md:text-6xl lg:text-8xl font-black text-gray-900 mb-8 tracking-tight leading-tight">
           <span className="relative inline-block z-10">
             Photo
-            <Sparkles className="absolute -top-6 -left-6 md:-top-8 md:-left-10 w-8 h-8 md:w-12 md:h-12 text-yellow-400 fill-yellow-200 animate-bounce duration-[3000ms]" strokeWidth={1.5} />
+            <Sparkles className="absolute -top-6 -left-6 md:-top-8 md:-left-10 w-8 h-8 md:w-12 md:h-12 text-yellow-400 fill-yellow-200 animate-bounce" style={{ animationDuration: '3000ms' }} strokeWidth={1.5} />
           </span>{" "}
           <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 pb-2">
             Gallery
