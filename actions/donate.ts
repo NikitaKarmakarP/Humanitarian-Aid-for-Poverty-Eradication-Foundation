@@ -1,10 +1,12 @@
 "use server"
 
+import { supabase } from "@/lib/supabase"
+
 interface DonationData {
   amount: number
   type: "one-time" | "monthly"
-  paymentMethod: "card" | "upi" | "bank"
-  fullName: string
+  payment_method: "card" | "upi" | "bank"
+  full_name: string
   email: string
   phone?: string
   city?: string
@@ -12,39 +14,44 @@ interface DonationData {
 }
 
 export async function processDonation(formData: FormData) {
-  // Simulate processing delay
-  await new Promise((resolve) => setTimeout(resolve, 2000))
+  try {
+    const donationData: DonationData = {
+      amount: Number.parseInt(formData.get("amount") as string),
+      type: formData.get("type") as "one-time" | "monthly",
+      payment_method: formData.get("paymentMethod") as "card" | "upi" | "bank",
+      full_name: formData.get("fullName") as string,
+      email: formData.get("email") as string,
+      phone: (formData.get("phone") as string) || undefined,
+      city: (formData.get("city") as string) || undefined,
+      message: (formData.get("message") as string) || undefined,
+    }
 
-  const donationData: DonationData = {
-    amount: Number.parseInt(formData.get("amount") as string),
-    type: formData.get("type") as "one-time" | "monthly",
-    paymentMethod: formData.get("paymentMethod") as "card" | "upi" | "bank",
-    fullName: formData.get("fullName") as string,
-    email: formData.get("email") as string,
-    phone: (formData.get("phone") as string) || undefined,
-    city: (formData.get("city") as string) || undefined,
-    message: (formData.get("message") as string) || undefined,
-  }
+    // 1. Simulate payment processing (in reality, you'd integrate Razorpay/Stripe here)
+    await new Promise((resolve) => setTimeout(resolve, 2000))
 
-  // Here you would integrate with actual payment gateway
-  // For now, we'll simulate a successful donation
+    // 2. Save to Supabase
+    const { data, error } = await supabase
+      .from('donations')
+      .insert([{
+        ...donationData,
+        created_at: new Date().toISOString(),
+        status: 'completed' // In a real app, this would depend on payment gateway response
+      }])
+      .select()
 
-  // Generate donation ID
-  const donationId = `HAPEF${Date.now()}`
+    if (error) throw error
 
-  // In a real application, you would:
-  // 1. Validate the donation data
-  // 2. Process payment through payment gateway
-  // 3. Save donation record to database
-  // 4. Send confirmation email with receipt
-  // 5. Update donor records
-
-  console.log("Processing donation:", donationData)
-
-  return {
-    success: true,
-    donationId,
-    message: `Thank you ${donationData.fullName}! Your ${donationData.type} donation of ₹${donationData.amount.toLocaleString()} has been processed successfully.`,
-    receiptEmail: donationData.email,
+    return {
+      success: true,
+      donationId: data[0].id,
+      message: `Thank you ${donationData.full_name}! Your ${donationData.type} donation of ₹${donationData.amount.toLocaleString()} has been processed successfully.`,
+      receiptEmail: donationData.email,
+    }
+  } catch (error) {
+    console.error("Donation Error:", error)
+    return {
+      success: false,
+      message: "An error occurred while processing your donation. Please try again later."
+    }
   }
 }

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
+import { submitInternshipApplication } from "@/actions/internship"
 import {
   Dialog,
   DialogContent,
@@ -59,16 +60,33 @@ export default function GetInvolvedPage() {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    const formData = new FormData(e.currentTarget)
+    // Add controlled component values
+    formData.append("position", formPosition)
+    formData.append("experience", formExperience)
+    formData.append("hearAbout", formSource)
+    if (formFileName) {
+      formData.append("resume-name", formFileName)
+    }
 
-    setIsSubmitting(false)
-    setIsSuccess(true)
-
-    toast({
-      title: "Application Submitted!",
-      description: "We've received your application and will review it soon.",
-    })
+    try {
+      const result = await submitInternshipApplication(formData)
+      if (result.success) {
+        setIsSuccess(true)
+        toast({
+          title: "Application Submitted!",
+          description: result.message,
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Submission Failed",
+        description: "There was an error submitting your application. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
   const [selectedDepartment, setSelectedDepartment] = useState("All Departments")
   const [selectedType, setSelectedType] = useState("All Types")

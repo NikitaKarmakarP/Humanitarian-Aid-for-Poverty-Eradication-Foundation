@@ -19,7 +19,10 @@ import {
   Award,
   Zap,
   CheckCircle,
+  Loader2,
 } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
+import { processDonation } from "@/actions/donate"
 
 export function DonationForm() {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null)
@@ -27,6 +30,7 @@ export function DonationForm() {
   const [donationType, setDonationType] = useState<"one-time" | "monthly">("one-time")
   const [paymentMethod, setPaymentMethod] = useState<"card" | "upi" | "bank">("card")
   const [isProcessing, setIsProcessing] = useState(false)
+  const { toast } = useToast()
 
   const predefinedAmounts = [
     { amount: 500, popular: false },
@@ -51,12 +55,29 @@ export function DonationForm() {
     return selectedAmount || Number.parseInt(customAmount) || 0
   }
 
-  const handleDonation = (e: React.FormEvent) => {
+  const handleDonation = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setIsProcessing(true)
 
-    const element = document.getElementById("payment-methods")
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" })
+    const formData = new FormData(e.currentTarget)
+    const result = await processDonation(formData)
+
+    setIsProcessing(false)
+
+    if (result.success) {
+      toast({
+        title: "Donation Successful!",
+        description: result.message,
+      })
+      // Reset form or redirect if needed
+      setSelectedAmount(null)
+      setCustomAmount("")
+    } else {
+      toast({
+        title: "Error",
+        description: result.message,
+        variant: "destructive",
+      })
     }
   }
 
@@ -109,6 +130,11 @@ export function DonationForm() {
 
           <CardContent className="p-10">
             <form onSubmit={handleDonation} className="space-y-10">
+              {/* Hidden State Inputs */}
+              <input type="hidden" name="amount" value={getFinalAmount()} />
+              <input type="hidden" name="type" value={donationType} />
+              <input type="hidden" name="paymentMethod" value={paymentMethod} />
+
               {/* Donation Type with Enhanced Design */}
               <div className="space-y-6">
                 <label className="block text-lg font-semibold text-gray-800 mb-4">Choose Donation Type</label>
@@ -252,6 +278,7 @@ export function DonationForm() {
                       </label>
                       <Input
                         id={field.id}
+                        name={field.id}
                         type={field.type}
                         required={field.required}
                         placeholder={`Enter your ${field.label.toLowerCase()}`}
@@ -269,6 +296,7 @@ export function DonationForm() {
                 </label>
                 <Textarea
                   id="message"
+                  name="message"
                   rows={4}
                   placeholder="Share why you're supporting HAPEF or any specific program you'd like to support..."
                   className="p-4 rounded-xl border-2 border-gray-200 focus:border-green-500 transition-colors duration-300"

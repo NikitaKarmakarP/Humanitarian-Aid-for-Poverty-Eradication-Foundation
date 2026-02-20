@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Send, CheckCircle2, Loader2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
+import { submitContactForm } from "@/actions/contact"
+
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -16,16 +18,24 @@ export function ContactForm() {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    const formData = new FormData(e.currentTarget)
+    const result = await submitContactForm(formData)
 
     setIsSubmitting(false)
-    setIsSuccess(true)
 
-    toast({
-      title: "Message Sent!",
-      description: "We've received your message and will get back to you soon.",
-    })
+    if (result.success) {
+      setIsSuccess(true)
+      toast({
+        title: "Message Sent!",
+        description: result.message,
+      })
+    } else {
+      toast({
+        title: "Error",
+        description: result.message,
+        variant: "destructive",
+      })
+    }
   }
 
   if (isSuccess) {
@@ -36,7 +46,7 @@ export function ContactForm() {
         </div>
         <h3 className="text-3xl font-bold text-gray-900 mb-4">Thank You!</h3>
         <p className="text-gray-600 mb-8 max-w-sm">
-          Your message has been successfully sent. Our team will review your enquiry and contact you shortly.
+          Your message has been sent successfully! Our team will review your enquiry and contact you shortly.
         </p>
         <Button
           onClick={() => setIsSuccess(false)}
@@ -59,6 +69,7 @@ export function ContactForm() {
             </label>
             <Input
               id="firstName"
+              name="firstName"
               required
               placeholder="Enter your first name"
               className="h-12 text-base rounded-xl border-gray-200 focus:border-green-500 transition-all bg-gray-50/50"
@@ -70,6 +81,7 @@ export function ContactForm() {
             </label>
             <Input
               id="lastName"
+              name="lastName"
               required
               placeholder="Enter your last name"
               className="h-12 text-base rounded-xl border-gray-200 focus:border-green-500 transition-all bg-gray-50/50"
@@ -83,6 +95,7 @@ export function ContactForm() {
           </label>
           <Input
             id="email"
+            name="email"
             type="email"
             required
             placeholder="Enter your email address"
@@ -96,6 +109,7 @@ export function ContactForm() {
           </label>
           <Input
             id="phone"
+            name="phone"
             type="tel"
             placeholder="Enter your phone number"
             className="h-12 text-base rounded-xl border-gray-200 focus:border-green-500 transition-all bg-gray-50/50"
@@ -108,6 +122,7 @@ export function ContactForm() {
           </label>
           <Input
             id="subject"
+            name="subject"
             required
             placeholder="What is this regarding?"
             className="h-12 text-base rounded-xl border-gray-200 focus:border-green-500 transition-all bg-gray-50/50"
@@ -120,6 +135,7 @@ export function ContactForm() {
           </label>
           <Textarea
             id="message"
+            name="message"
             required
             rows={5}
             placeholder="Tell us more about your enquiry…"
