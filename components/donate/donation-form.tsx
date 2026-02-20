@@ -30,15 +30,16 @@ export function DonationForm() {
   const [donationType, setDonationType] = useState<"one-time" | "monthly">("one-time")
   const [paymentMethod, setPaymentMethod] = useState<"card" | "upi" | "bank">("card")
   const [isProcessing, setIsProcessing] = useState(false)
+  const [donationResult, setDonationResult] = useState<any>(null)
   const { toast } = useToast()
 
   const predefinedAmounts = [
-    { amount: 500, popular: false },
-    { amount: 1000, popular: false },
-    { amount: 2000, popular: true },
-    { amount: 5000, popular: false },
-    { amount: 10000, popular: false },
-    { amount: 25000, popular: false },
+    { amount: 500, description: "Provided educational support to a student", popular: false },
+    { amount: 1000, description: "Provided educational support to 2 students", popular: false },
+    { amount: 2000, description: "Supported a family with mushroom seeds and equipment", popular: true },
+    { amount: 5000, description: "Supported kitchen garden kits to 5 families", popular: false },
+    { amount: 10000, description: "Sets up complete mushroom unit", popular: false },
+    { amount: 25000, description: "Transform a village", popular: false },
   ]
 
   const handleAmountSelect = (amount: number) => {
@@ -62,23 +63,115 @@ export function DonationForm() {
     const formData = new FormData(e.currentTarget)
     const result = await processDonation(formData)
 
-    setIsProcessing(false)
+    setIsProcessing(true) // Keep processing for a moment to feel realistic
 
     if (result.success) {
-      toast({
-        title: "Donation Successful!",
-        description: result.message,
-      })
-      // Reset form or redirect if needed
-      setSelectedAmount(null)
-      setCustomAmount("")
+      setTimeout(() => {
+        setIsProcessing(false)
+        setDonationResult({
+          ...result,
+          amount: getFinalAmount(),
+          type: donationType,
+          date: new Date().toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+        })
+        toast({
+          title: "Donation Successful!",
+          description: "Your receipt has been generated.",
+        })
+      }, 1500)
     } else {
+      setIsProcessing(false)
       toast({
         title: "Error",
         description: result.message,
         variant: "destructive",
       })
     }
+  }
+
+  if (donationResult) {
+    return (
+      <section className="py-24 bg-gradient-to-br from-gray-50 to-green-50">
+        <div className="max-w-3xl mx-auto px-4">
+          <Card className="shadow-2xl border-0 overflow-hidden bg-white">
+            <div className="bg-gradient-to-r from-emerald-600 to-green-600 p-8 text-white text-center">
+              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-md">
+                <CheckCircle className="h-12 w-12 text-white" />
+              </div>
+              <h2 className="text-3xl font-bold mb-2">Donation Receipt</h2>
+              <p className="text-emerald-50">Thank you for your generous contribution!</p>
+            </div>
+            <CardContent className="p-8 space-y-8">
+              <div className="flex justify-between items-center border-b border-gray-100 pb-6">
+                <div>
+                  <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold">Transaction ID</p>
+                  <p className="text-lg font-mono font-bold text-gray-900">#HAPE-{donationResult.donationId}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold">Date</p>
+                  <p className="text-lg font-bold text-gray-900">{donationResult.date}</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Donor Name</span>
+                  <span className="font-bold text-gray-900">{donationResult.full_name || "Valued Supporter"}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Donation Type</span>
+                  <span className="font-bold text-gray-900 capitalize">{donationResult.type}</span>
+                </div>
+                <div className="flex justify-between items-center bg-green-50 p-4 rounded-xl">
+                  <span className="text-green-700 font-bold text-lg">Amount Paid</span>
+                  <span className="text-2xl font-black text-green-700">₹{donationResult.amount.toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-100 p-6 rounded-2xl">
+                <div className="flex gap-3">
+                  <Award className="h-6 w-6 text-yellow-600 shrink-0" />
+                  <div>
+                    <h4 className="font-bold text-yellow-900 mb-1">Tax Benefit Information</h4>
+                    <p className="text-sm text-yellow-800 leading-relaxed">
+                      This receipt acknowledges your donation to HAPEF. Your contribution is eligible for tax deduction under Section 80G of the Income Tax Act. A formal 80G certificate will be sent to <strong>{donationResult.receiptEmail}</strong> within 24 hours.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6 flex gap-4">
+                <Button
+                  variant="outline"
+                  className="flex-1 rounded-xl h-12 border-gray-200"
+                  onClick={() => window.print()}
+                >
+                  Download PDF
+                </Button>
+                <Button
+                  className="flex-1 rounded-xl h-12 bg-emerald-600 hover:bg-emerald-700 text-white"
+                  onClick={() => setDonationResult(null)}
+                >
+                  Back to Home
+                </Button>
+              </div>
+            </CardContent>
+            <div className="bg-gray-50 p-6 text-center border-t border-gray-100">
+              <p className="text-xs text-gray-400">
+                HAPEF - Humanitarian Aid & Peace Welfare Foundation<br />
+                Reg No: IV-190303847 | PAN: AABTH4123C
+              </p>
+            </div>
+          </Card>
+        </div>
+      </section>
+    )
   }
 
   return (
@@ -186,12 +279,7 @@ export function DonationForm() {
                       )}
                       <div className="font-bold text-2xl text-gray-900 mb-2">₹{item.amount.toLocaleString()}</div>
                       <div className="text-sm text-gray-600">
-                        {item.amount === 500 && "Provided educational support to a student"}
-                        {item.amount === 1000 && "Provided educational support to 2 students"}
-                        {item.amount === 2000 && "Supported a family with mushroom seeds and equipment"}
-                        {item.amount === 5000 && "Supported kitchen garden kits to 5 families"}
-                        {item.amount === 10000 && "Sets up complete mushroom unit"}
-                        {item.amount === 25000 && "Transform a village"}
+                        {item.description}
                       </div>
                       {selectedAmount === item.amount && (
                         <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">

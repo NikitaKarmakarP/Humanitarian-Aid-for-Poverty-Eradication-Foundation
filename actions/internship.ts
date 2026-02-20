@@ -42,7 +42,7 @@ export async function submitInternshipApplication(formData: FormData) {
 
         return {
             success: true,
-            message: `Thank you ${applicationData.first_name}! Your application for ${applicationData.position} has been received.`,
+            message: "Your application submitted successfully! Best of luck!",
             applicationId: data[0].id.toString()
         }
     } catch (error) {

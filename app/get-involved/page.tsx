@@ -628,9 +628,9 @@ export default function GetInvolvedPage() {
                   <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-8">
                     <CheckCircle2 className="h-12 w-12 text-emerald-600" />
                   </div>
-                  <h3 className="text-3xl font-bold text-gray-900 mb-4">Application Received!</h3>
+                  <h3 className="text-3xl font-bold text-gray-900 mb-4">Application Submitted!</h3>
                   <p className="text-xl text-gray-600 mb-10 max-w-md">
-                    Thank you for your interest in joining HAPEF. Our HR team will review your application and get in touch if your profile matches our requirements.
+                    Your application submitted successfully! Best of luck! Our HR team will review your profile and get in touch shortly.
                   </p>
                   <Button
                     onClick={() => {

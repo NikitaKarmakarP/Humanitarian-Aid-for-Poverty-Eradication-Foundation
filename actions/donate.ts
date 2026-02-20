@@ -26,6 +26,8 @@ export async function processDonation(formData: FormData) {
       message: (formData.get("message") as string) || undefined,
     }
 
+    console.log("Processing Donation for:", donationData.full_name, "Amount:", donationData.amount)
+
     // 1. Simulate payment processing (in reality, you'd integrate Razorpay/Stripe here)
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
@@ -44,6 +46,7 @@ export async function processDonation(formData: FormData) {
     return {
       success: true,
       donationId: data[0].id,
+      full_name: donationData.full_name,
       message: `Thank you ${donationData.full_name}! Your ${donationData.type} donation of ₹${donationData.amount.toLocaleString()} has been processed successfully.`,
       receiptEmail: donationData.email,
     }
